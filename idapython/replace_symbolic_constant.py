@@ -33,18 +33,23 @@ def replace_sym_const(ea, api):
             if op == "push":
                 push_cnt += 1
 
-        operand   = int(idc.print_operand(ea_search, 0))
+        operand   = idc.print_operand(ea_search, 0)
+        if operand.isdigit():
+            operand   = int(idc.print_operand(ea_search, 0))
+        else:
+            continue
+
         enum_name = api + "_" + str(arg_n)
         const     = api_list[api][arg_n][operand]
 
         enum_id   = ida_enum.get_enum(enum_name)
-        if enum_id == 0xffffffff:
+        if enum_id == BADADDR:
             # add new enum
             enum_qty  = ida_enum.get_enum_qty()
             enum_id   = ida_enum.add_enum(enum_qty, enum_name, 0)
 
         symbolic_id = ida_enum.get_enum_member_by_name(const)
-        if symbolic_id == 0xffffffff:
+        if symbolic_id == BADADDR:
             # add new enum member
             ida_enum.add_enum_member(enum_id, const, operand, 0xffffffff)
 
